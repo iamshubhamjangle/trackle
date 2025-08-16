@@ -9,13 +9,106 @@ const STORAGE_KEYS = {
 
 // Default tags
 export const DEFAULT_TAGS: Tag[] = [
-  { id: "array", name: "Array", color: "bg-blue-500" },
-  { id: "heap", name: "Heap", color: "bg-green-500" },
-  { id: "dp", name: "DP", color: "bg-purple-500" },
-  { id: "dp-advance", name: "DP Advanced", color: "bg-indigo-500" },
-  { id: "graph", name: "Graph", color: "bg-red-500" },
-  { id: "default", name: "Default", color: "bg-gray-500" },
-  { id: "starred", name: "Starred", color: "bg-yellow-500" },
+  {
+    id: "default",
+    name: "Default",
+    color: "bg-gray-500",
+  },
+  {
+    id: "starred",
+    name: "Starred",
+    color: "bg-yellow-500",
+  },
+  {
+    id: "tag-1755331013001",
+    name: "Arrays",
+    color: "bg-blue-500",
+  },
+  {
+    id: "tag-1755331013002",
+    name: "Heap",
+    color: "bg-green-500",
+  },
+  {
+    id: "tag-1755331013586",
+    name: "Two Pointers",
+    color: "bg-blue-500",
+  },
+  {
+    id: "tag-1755331023426",
+    name: "Sliding Window",
+    color: "bg-indigo-500",
+  },
+  {
+    id: "tag-1755331030842",
+    name: "Stack",
+    color: "bg-purple-500",
+  },
+  {
+    id: "tag-1755331042314",
+    name: "Binary Search",
+    color: "bg-yellow-500",
+  },
+  {
+    id: "tag-1755331197882",
+    name: "Linked List",
+    color: "bg-blue-500",
+  },
+  {
+    id: "tag-1755331207258",
+    name: "Trees",
+    color: "bg-green-500",
+  },
+  {
+    id: "tag-1755331227874",
+    name: "Backtracking",
+    color: "bg-green-500",
+  },
+  {
+    id: "tag-1755331234297",
+    name: "Tries",
+    color: "bg-green-500",
+  },
+  {
+    id: "tag-1755331241474",
+    name: "Graphs",
+    color: "bg-red-500",
+  },
+  {
+    id: "tag-1755331246026",
+    name: "Advanced Graphs",
+    color: "bg-red-500",
+  },
+  {
+    id: "tag-1755331250530",
+    name: "DP 1D",
+    color: "bg-red-500",
+  },
+  {
+    id: "tag-1755331254538",
+    name: "DP 2D",
+    color: "bg-red-500",
+  },
+  {
+    id: "tag-1755331260530",
+    name: "Greedy",
+    color: "bg-pink-500",
+  },
+  {
+    id: "tag-1755331264842",
+    name: "Intervals",
+    color: "bg-pink-500",
+  },
+  {
+    id: "tag-1755331271499",
+    name: "Math",
+    color: "bg-blue-500",
+  },
+  {
+    id: "tag-1755331275314",
+    name: "Bit Manipulation",
+    color: "bg-blue-500",
+  },
 ];
 
 // Questions storage

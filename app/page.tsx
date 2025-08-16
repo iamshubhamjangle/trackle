@@ -91,6 +91,8 @@ export default function StudyPage() {
   };
 
   const toggleAllFolded = () => {
+    // Only allow folding/unfolding in categoryWise mode
+    if (!studyOptions.categoryWise) return;
     const newAllFolded = !studyOptions.allFolded;
     const newOptions = { ...studyOptions, allFolded: newAllFolded };
     setStudyOptions(newOptions);
@@ -127,12 +129,23 @@ export default function StudyPage() {
   };
 
   const toggleCategoryWise = () => {
+    const newCategoryWise = !studyOptions.categoryWise;
     const newOptions = {
       ...studyOptions,
-      categoryWise: !studyOptions.categoryWise,
+      categoryWise: newCategoryWise,
     };
+    // If switching to non-categoryWise, force allFolded to false
+    if (!newCategoryWise) {
+      newOptions.allFolded = false;
+    }
     setStudyOptions(newOptions);
     saveStudyOptions(newOptions);
+    // If switching to non-categoryWise, set expandedTags to only show 'all'
+    if (!newCategoryWise) {
+      setExpandedTags(new Set(["all"]));
+    } else {
+      setExpandedTags(new Set(tags.map((tag) => tag.id)));
+    }
   };
 
   const resetProgress = () => {
@@ -301,6 +314,7 @@ export default function StudyPage() {
 
         <Button
           onClick={toggleAllFolded}
+          disabled={!studyOptions.categoryWise}
           // variant={studyOptions.allFolded ? "default" : "outline"}
           variant="outline"
           size="sm"
@@ -339,7 +353,11 @@ export default function StudyPage() {
           >
             <CardHeader
               className="cursor-pointer"
-              onClick={() => toggleTagExpansion(tag.id)}
+              onClick={() => {
+                // donot fold if in all questions mode
+                if (!studyOptions.categoryWise) return;
+                toggleTagExpansion(tag.id);
+              }}
             >
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center space-x-3">
