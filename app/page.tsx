@@ -12,6 +12,9 @@ import {
   EyeOff,
   Shuffle,
   List,
+  GalleryVertical,
+  FoldVertical,
+  UnfoldVertical,
 } from "lucide-react";
 import { Question, Tag, StudyOptions } from "@/lib/types";
 import {
@@ -27,6 +30,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 import { cn } from "@/lib/utils";
+import { Progress } from "@/components/ui/progress";
 
 export default function StudyPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -39,6 +43,7 @@ export default function StudyPage() {
     randomize: false,
     categoryWise: true,
     allFolded: false,
+    starred: false,
   });
   const [expandedTags, setExpandedTags] = useState<Set<string>>(new Set());
 
@@ -119,6 +124,12 @@ export default function StudyPage() {
     }
   };
 
+  const toggleStarred = () => {
+    const newOptions = { ...studyOptions, starred: !studyOptions.starred };
+    setStudyOptions(newOptions);
+    saveStudyOptions(newOptions);
+  };
+
   const toggleQuestionCompleted = (questionId: string) => {
     const currentProgress = progress[questionId] || {
       completed: false,
@@ -194,31 +205,18 @@ export default function StudyPage() {
 
   const getTotalCount = () => questions.length;
 
-  const getDifficultyBadgeVariant = (difficulty: string) => {
-    switch (difficulty) {
-      case "Easy":
-        return "default";
-      case "Medium":
-        return "secondary";
-      case "Hard":
-        return "destructive";
-      default:
-        return "outline";
-    }
-  };
-
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        {/* <h1 className="text-3xl font-bold">Problems</h1> */}
-        <div className="text-sm text-muted-foreground">
-          Progress: {getCompletedCount()}/{getTotalCount()} completed
-        </div>
+      <div className="flex items-center">
+        <span className="text-sm text-muted-foreground min-w-xs">
+          Progress: {getCompletedCount()}/{getTotalCount()}
+        </span>
+        <Progress value={(getCompletedCount() / getTotalCount()) * 100} />
       </div>
 
       {/* Study Options */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <Button
           onClick={toggleDifficulty}
           // variant={studyOptions.showDifficulty ? "default" : "outline"}
@@ -255,8 +253,18 @@ export default function StudyPage() {
           size="sm"
           className="flex items-center space-x-2"
         >
-          <List className="h-4 w-4" />
-          <span>Category Wise</span>
+          <GalleryVertical className="h-4 w-4" />
+          <span>Topic Wise</span>
+        </Button>
+
+        <Button
+          onClick={toggleStarred}
+          variant={studyOptions.starred ? "default" : "outline"}
+          size="sm"
+          className="flex items-center space-x-2"
+        >
+          <Star className="h-4 w-4" />
+          <span>Starred</span>
         </Button>
 
         <Button
@@ -266,9 +274,17 @@ export default function StudyPage() {
           size="sm"
           className="flex items-center space-x-2"
         >
-          <span>
-            {studyOptions.allFolded ? "Unfold Questions" : "Fold Questions"}
-          </span>
+          {studyOptions.allFolded ? (
+            <>
+              <UnfoldVertical className="h-4 w-4" />
+              <span>Unfold Questions</span>
+            </>
+          ) : (
+            <>
+              <FoldVertical className="h-4 w-4" />
+              <span>Fold Questions</span>
+            </>
+          )}
         </Button>
 
         <Button
@@ -367,11 +383,7 @@ export default function StudyPage() {
                           </div>
 
                           {studyOptions.showDifficulty && (
-                            <Badge
-                              variant={getDifficultyBadgeVariant(
-                                question.difficulty
-                              )}
-                            >
+                            <Badge variant="outline">
                               {question.difficulty}
                             </Badge>
                           )}

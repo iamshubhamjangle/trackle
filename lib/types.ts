@@ -26,6 +26,7 @@ export interface StudyOptions {
   randomize: boolean;
   categoryWise: boolean;
   allFolded: boolean;
+  starred: boolean;
 }
 
 export interface QuestionProgress {
