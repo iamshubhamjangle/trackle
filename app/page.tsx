@@ -46,6 +46,8 @@ export default function StudyPage() {
     starred: false,
   });
   const [expandedTags, setExpandedTags] = useState<Set<string>>(new Set());
+  // Store random order for session
+  const [randomOrder, setRandomOrder] = useState<string[] | null>(null);
 
   useEffect(() => {
     const storedQuestions = getQuestions();
@@ -65,6 +67,18 @@ export default function StudyPage() {
       setExpandedTags(new Set(storedTags.map((tag) => tag.id)));
     }
   }, []);
+
+  // Reset random order if questions change or randomize is turned off
+  useEffect(() => {
+    if (!studyOptions.randomize) {
+      setRandomOrder(null);
+    } else if (studyOptions.randomize && questions.length > 0 && !randomOrder) {
+      setRandomOrder(
+        [...questions.map((q) => q.id)].sort(() => Math.random() - 0.5)
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [questions, studyOptions.randomize]);
 
   const toggleTagExpansion = (tagId: string) => {
     const newExpanded = new Set(expandedTags);
@@ -99,9 +113,17 @@ export default function StudyPage() {
   };
 
   const toggleRandomize = () => {
-    const newOptions = { ...studyOptions, randomize: !studyOptions.randomize };
+    const newRandomize = !studyOptions.randomize;
+    const newOptions = { ...studyOptions, randomize: newRandomize };
     setStudyOptions(newOptions);
     saveStudyOptions(newOptions);
+    if (newRandomize) {
+      setRandomOrder(
+        [...questions.map((q) => q.id)].sort(() => Math.random() - 0.5)
+      );
+    } else {
+      setRandomOrder(null);
+    }
   };
 
   const toggleCategoryWise = () => {
@@ -164,11 +186,16 @@ export default function StudyPage() {
     let tagQuestions = questions.filter((q) =>
       q.tags.includes(tagId.toLowerCase())
     );
-
-    if (studyOptions.randomize) {
-      tagQuestions = [...tagQuestions].sort(() => Math.random() - 0.5);
+    // Filter by starred if needed
+    if (studyOptions.starred) {
+      tagQuestions = tagQuestions.filter((q) => progress[q.id]?.starred);
     }
 
+    if (studyOptions.randomize && randomOrder) {
+      tagQuestions = randomOrder
+        .map((id) => tagQuestions.find((q) => q.id === id))
+        .filter((q): q is Question => !!q);
+    }
     return tagQuestions;
   };
 
@@ -181,10 +208,15 @@ export default function StudyPage() {
         }))
         .filter((group) => group.questions.length > 0);
     } else {
-      // Show all questions in a single list
       let allQuestions = [...questions];
-      if (studyOptions.randomize) {
-        allQuestions = allQuestions.sort(() => Math.random() - 0.5);
+      // Filter by starred if needed
+      if (studyOptions.starred) {
+        allQuestions = allQuestions.filter((q) => progress[q.id]?.starred);
+      }
+      if (studyOptions.randomize && randomOrder) {
+        allQuestions = randomOrder
+          .map((id) => allQuestions.find((q) => q.id === id))
+          .filter((q): q is Question => !!q);
       }
       return [
         {
@@ -226,12 +258,12 @@ export default function StudyPage() {
         >
           {studyOptions.showDifficulty ? (
             <>
-              <Eye className="h-4 w-4" />
+              <EyeOff className="h-4 w-4" />
               <span>Hide Difficulty</span>
             </>
           ) : (
             <>
-              <EyeOff className="h-4 w-4" />
+              <Eye className="h-4 w-4" />
               <span>Show Difficulty</span>
             </>
           )}
@@ -309,18 +341,37 @@ export default function StudyPage() {
               className="cursor-pointer"
               onClick={() => toggleTagExpansion(tag.id)}
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between w-full">
                 <div className="flex items-center space-x-3">
                   <div className={cn("w-4 h-4 rounded-full", tag.color)} />
                   <CardTitle className="text-lg">
-                    {tag.name} ({tagQuestions.length})
+                    {tag.name} (
+                    {
+                      tagQuestions.filter(
+                        (q) => getQuestionProgress(q.id).completed
+                      ).length
+                    }
+                    /{tagQuestions.length})
                   </CardTitle>
                 </div>
-                {expandedTags.has(tag.id) ? (
-                  <ChevronDown className="h-5 w-5 text-muted-foreground" />
-                ) : (
-                  <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                )}
+                <div className="flex flex-1 items-center space-x-2 ml-10">
+                  <Progress
+                    value={
+                      tagQuestions.length === 0
+                        ? 0
+                        : (tagQuestions.filter(
+                            (q) => getQuestionProgress(q.id).completed
+                          ).length /
+                            tagQuestions.length) *
+                          100
+                    }
+                  />
+                  {expandedTags.has(tag.id) ? (
+                    <ChevronDown className="h-5 w-5 text-muted-foreground mt-1" />
+                  ) : (
+                    <ChevronRight className="h-5 w-5 text-muted-foreground mt-1" />
+                  )}
+                </div>
               </div>
             </CardHeader>
 
