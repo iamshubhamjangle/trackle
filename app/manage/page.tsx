@@ -106,12 +106,16 @@ export default function ManagePage() {
   // Question management
   const handleAddQuestion = () => {
     if (newQuestion.name && newQuestion.url) {
+      // Convert tag ids to tag names
+      const tagNames = newQuestion.tags.map(
+        (tagId) => tags.find((t) => t.id === tagId)?.name || tagId
+      );
       const question: Question = {
         id: `question-${Date.now()}`,
         name: newQuestion.name,
         url: newQuestion.url,
         difficulty: newQuestion.difficulty,
-        tags: newQuestion.tags,
+        tags: tagNames,
         completed: false,
         starred: false,
       };
@@ -125,8 +129,13 @@ export default function ManagePage() {
 
   const handleUpdateQuestion = () => {
     if (editingQuestion) {
+      // Convert tag ids to tag names for the updated question
+      const tagNames = editingQuestion.tags.map(
+        (tagId) => tags.find((t) => t.id === tagId)?.name || tagId
+      );
+      const updatedQuestion = { ...editingQuestion, tags: tagNames };
       const updatedQuestions = questions.map((q) =>
-        q.id === editingQuestion.id ? { ...editingQuestion } : q
+        q.id === editingQuestion.id ? updatedQuestion : q
       );
       setQuestions(updatedQuestions);
       saveQuestions(updatedQuestions);
@@ -546,11 +555,24 @@ export default function ManagePage() {
                   {tags.map((tag) => (
                     <label key={tag.id} className="flex items-center space-x-2">
                       <Checkbox
-                        checked={editingQuestion.tags.includes(tag.id)}
+                        checked={editingQuestion.tags.some(
+                          (t) => t.toLowerCase() === tag.name.toLowerCase()
+                        )}
                         onCheckedChange={(checked) => {
-                          const newTags = checked
-                            ? [...editingQuestion.tags, tag.id]
-                            : editingQuestion.tags.filter((t) => t !== tag.id);
+                          const tagNameLower = tag.name.toLowerCase();
+                          let newTags;
+                          if (checked) {
+                            // Add only if not present (case-insensitive)
+                            newTags = editingQuestion.tags.some(
+                              (t) => t.toLowerCase() === tagNameLower
+                            )
+                              ? editingQuestion.tags
+                              : [...editingQuestion.tags, tag.name];
+                          } else {
+                            newTags = editingQuestion.tags.filter(
+                              (t) => t.toLowerCase() !== tagNameLower
+                            );
+                          }
                           setEditingQuestion({
                             ...editingQuestion,
                             tags: newTags,
