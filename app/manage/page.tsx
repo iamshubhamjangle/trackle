@@ -382,7 +382,6 @@ export default function ManagePage() {
                       setEditingTag(tag);
                       setNewTagName(tag.name);
                       setNewTagColor(tag.color);
-                      setShowAddTag(true);
                     }}
                     variant="ghost"
                     size="sm"
@@ -455,14 +454,14 @@ export default function ManagePage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex flex-wrap gap-1">
                         {question.tags.map((tagId) => {
-                          const tag = tags.find((t) => t.id === tagId);
-                          return tag ? (
+                          //   const tag = tags.find((t) => t.id === tagId);
+                          return tagId ? (
                             <Badge
                               key={tagId}
                               variant="outline"
-                              className={cn("text-white", tag.color)}
+                              className={cn("text-primary")}
                             >
-                              {tag.name}
+                              {tagId}
                             </Badge>
                           ) : null;
                         })}
