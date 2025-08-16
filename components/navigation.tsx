@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { BookOpen, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { ModeToggle } from "./ui/mode-toggle";
 
 export function Navigation() {
   const pathname = usePathname();
@@ -57,6 +58,7 @@ export function Navigation() {
                 </Button>
               );
             })}
+            <ModeToggle />
           </div>
         </div>
       </div>
