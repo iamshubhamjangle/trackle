@@ -200,7 +200,7 @@ export default function ManagePage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-8">
+    <div className="max-w-7xl mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Manage Problems</h1>
         <div className="flex space-x-3">
@@ -309,6 +309,17 @@ export default function ManagePage() {
             <span>Export</span>
           </Button>
         </div>
+      </div>
+
+      {/* Sample Questions Download Link */}
+      <div>
+        <a
+          href="/sample_questions.csv"
+          download
+          className="text-muted-foreground text-xs hover:underline text-end inline-block"
+        >
+          Getting Started? Download Sample Questions .csv
+        </a>
       </div>
 
       {/* Tags Section */}
