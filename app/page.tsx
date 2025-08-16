@@ -150,7 +150,9 @@ export default function StudyPage() {
   };
 
   const getQuestionsForTag = (tagId: string) => {
-    let tagQuestions = questions.filter((q) => q.tags.includes(tagId));
+    let tagQuestions = questions.filter((q) =>
+      q.tags.includes(tagId.toLowerCase())
+    );
 
     if (studyOptions.randomize) {
       tagQuestions = [...tagQuestions].sort(() => Math.random() - 0.5);
@@ -162,9 +164,9 @@ export default function StudyPage() {
   const getFilteredQuestions = () => {
     if (studyOptions.categoryWise) {
       return tags
-        .map((tag) => ({
-          tag,
-          questions: getQuestionsForTag(tag.id),
+        .map((tagDetails) => ({
+          tag: tagDetails,
+          questions: getQuestionsForTag(tagDetails.name),
         }))
         .filter((group) => group.questions.length > 0);
     } else {
@@ -209,86 +211,86 @@ export default function StudyPage() {
     <div className="max-w-7xl mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Study Problems</h1>
+        {/* <h1 className="text-3xl font-bold">Problems</h1> */}
         <div className="text-sm text-muted-foreground">
           Progress: {getCompletedCount()}/{getTotalCount()} completed
         </div>
       </div>
 
       {/* Study Options */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Study Options</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Button
-              onClick={toggleDifficulty}
-              variant={studyOptions.showDifficulty ? "default" : "outline"}
-              size="sm"
-              className="flex items-center space-x-2"
-            >
-              {studyOptions.showDifficulty ? (
-                <Eye className="h-4 w-4" />
-              ) : (
-                <EyeOff className="h-4 w-4" />
-              )}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <Button
+          onClick={toggleDifficulty}
+          // variant={studyOptions.showDifficulty ? "default" : "outline"}
+          variant="outline"
+          size="sm"
+          className="flex items-center space-x-2"
+        >
+          {studyOptions.showDifficulty ? (
+            <>
+              <Eye className="h-4 w-4" />
               <span>Hide Difficulty</span>
-            </Button>
+            </>
+          ) : (
+            <>
+              <EyeOff className="h-4 w-4" />
+              <span>Show Difficulty</span>
+            </>
+          )}
+        </Button>
 
-            <Button
-              onClick={toggleRandomize}
-              variant={studyOptions.randomize ? "default" : "outline"}
-              size="sm"
-              className="flex items-center space-x-2"
-            >
-              <Shuffle className="h-4 w-4" />
-              <span>Randomize</span>
-            </Button>
+        <Button
+          onClick={toggleRandomize}
+          variant={studyOptions.randomize ? "default" : "outline"}
+          size="sm"
+          className="flex items-center space-x-2"
+        >
+          <Shuffle className="h-4 w-4" />
+          <span>Randomize</span>
+        </Button>
 
-            <Button
-              onClick={toggleCategoryWise}
-              variant={studyOptions.categoryWise ? "default" : "outline"}
-              size="sm"
-              className="flex items-center space-x-2"
-            >
-              <List className="h-4 w-4" />
-              <span>Category Wise</span>
-            </Button>
+        <Button
+          onClick={toggleCategoryWise}
+          variant={studyOptions.categoryWise ? "default" : "outline"}
+          size="sm"
+          className="flex items-center space-x-2"
+        >
+          <List className="h-4 w-4" />
+          <span>Category Wise</span>
+        </Button>
 
-            <Button
-              onClick={toggleAllFolded}
-              variant={studyOptions.allFolded ? "default" : "outline"}
-              size="sm"
-              className="flex items-center space-x-2"
-            >
-              {studyOptions.allFolded ? (
-                <ChevronRight className="h-4 w-4" />
-              ) : (
-                <ChevronDown className="h-4 w-4" />
-              )}
-              <span>{studyOptions.allFolded ? "Unfold All" : "Fold All"}</span>
-            </Button>
+        <Button
+          onClick={toggleAllFolded}
+          // variant={studyOptions.allFolded ? "default" : "outline"}
+          variant="outline"
+          size="sm"
+          className="flex items-center space-x-2"
+        >
+          <span>
+            {studyOptions.allFolded ? "Unfold Questions" : "Fold Questions"}
+          </span>
+        </Button>
 
-            <Button
-              onClick={resetProgress}
-              variant="destructive"
-              size="sm"
-              className="col-span-2 md:col-span-4 flex items-center justify-center space-x-2"
-            >
-              <RotateCcw className="h-4 w-4" />
-              <span>Reset Progress</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+        <Button
+          onClick={resetProgress}
+          variant="outline"
+          size="sm"
+          className="flex items-center space-x-2"
+        >
+          <RotateCcw className="h-4 w-4" />
+          <span>Reset Progress</span>
+        </Button>
+      </div>
 
       {/* Questions by Tags */}
-      <div className="space-y-4">
+      <div>
         {getFilteredQuestions().map(({ tag, questions: tagQuestions }) => (
-          <Card key={tag.id}>
+          <Card
+            key={tag.id}
+            className="hover:bg-muted/50 transition-colors py-2"
+          >
             <CardHeader
-              className="cursor-pointer hover:bg-muted/50 transition-colors"
+              className="cursor-pointer"
               onClick={() => toggleTagExpansion(tag.id)}
             >
               <div className="flex items-center justify-between">
