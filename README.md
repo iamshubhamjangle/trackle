@@ -1,54 +1,13 @@
-# Problem List - Coding Problem Management Tool
+# DSA List - Coding Problem Management Tool
 
-A comprehensive Next.js application for managing and studying coding problems with advanced features like tag management, progress tracking, and study options.
-
-## Features
-
-### 🏷️ Tag Management
-
-- **Default Tags**: Array, Heap, DP, DP Advanced, Graph, Default, Starred
-- **Custom Tags**: Add, edit, and delete custom tags with color coding
-- **Tag Colors**: Choose from 8 predefined color options
-
-### 📚 Question Management
-
-- **Manual Addition**: Add questions with name, URL, difficulty, and tags
-- **CSV Upload**: Bulk upload questions from CSV files
-- **Data Export**: Export your question list to CSV format
-- **CRUD Operations**: Full create, read, update, delete functionality
-
-### 📖 Study Mode
-
-- **Progress Tracking**: Mark questions as completed or starred
-- **Study Options**:
-  - Show/Hide difficulty levels
-  - Randomize question order
-  - Category-wise or single list view
-  - Fold/Unfold all categories
-- **Accordion Interface**: Collapsible sections for each tag category
-- **Progress Reset**: Reset all progress with confirmation
-
-### 🎨 Modern UI
-
-- **Responsive Design**: Works on desktop and mobile devices
-- **Tailwind CSS**: Beautiful, modern styling
-- **Lucide Icons**: Clean, consistent iconography
-- **Interactive Elements**: Hover effects, transitions, and smooth animations
-
-## Tech Stack
-
-- **Next.js 15** - React framework with App Router
-- **TypeScript** - Type-safe development
-- **Tailwind CSS** - Utility-first CSS framework
-- **Lucide React** - Beautiful, customizable icons
-- **Local Storage** - Client-side data persistence
+An application for studying and managing coding problems with advanced features like tagging, progress tracking, update/delete questions, import export bulk questions. It's time to build your own problem set.
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18+
-- npm or yarn
+- npm
 
 ### Installation
 
@@ -56,7 +15,7 @@ A comprehensive Next.js application for managing and studying coding problems wi
 
 ```bash
 git clone <repository-url>
-cd my-problem-list
+cd dsa-list
 ```
 
 2. Install dependencies:
@@ -73,6 +32,14 @@ npm run dev
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+## Tech Stack
+
+- **Next.js 15**
+- **TypeScript**
+- **Tailwind CSS**
+- **Shadcn Components**
+- **Lucide React Icons**
+
 ## Usage
 
 ### Adding Questions
@@ -80,12 +47,9 @@ npm run dev
 #### Manual Addition
 
 1. Navigate to the **Manage** page
-2. Click **"Add Question"**
-3. Fill in the question details:
-   - Name (question title)
-   - URL (LeetCode problem link)
-   - Difficulty (Easy/Medium/Hard)
-   - Tags (select from available tags)
+2. Download the sample .csv with neetcode 250 questions and import it OR Click **"Add Question"** to add single question.
+
+> Make sure the question tag is already created else it wont be visible in study page
 
 #### CSV Upload
 
@@ -141,27 +105,6 @@ Add Two Numbers,https://leetcode.com/problems/add-two-numbers/,Medium,Linked Lis
 - **Fold/Unfold**: Quickly collapse or expand all tag sections
 - **Reset Progress**: Clear all completion and star marks
 
-## File Structure
-
-```
-my-problem-list/
-├── app/
-│   ├── layout.tsx          # Root layout with navigation
-│   ├── page.tsx            # Study page (home)
-│   ├── manage/
-│   │   └── page.tsx        # Manage page for CRUD operations
-│   └── globals.css         # Global styles
-├── components/
-│   └── navigation.tsx      # Navigation component
-├── lib/
-│   ├── types.ts            # TypeScript interfaces
-│   ├── storage.ts          # Local storage utilities
-│   ├── excel.ts            # CSV processing utilities
-│   └── utils.ts            # Utility functions
-├── sample-questions.csv    # Sample data for testing
-└── package.json            # Dependencies and scripts
-```
-
 ## Data Persistence
 
 All data is stored in the browser's localStorage:
@@ -186,8 +129,8 @@ For successful CSV uploads, ensure your file has:
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+4. Write Test cases and test thoroughly
+5. Submit a pull request with before and after screenshots and description
 
 ## License
 
