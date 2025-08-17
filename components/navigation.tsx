@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Settings } from "lucide-react";
+import { BookOpen, Github, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { ModeToggle } from "./ui/mode-toggle";
@@ -34,7 +34,7 @@ export function Navigation() {
               height={30}
               alt="Logo images"
             ></Image>
-            <h1 className="text-md font-extrabold">Trackle</h1>
+            <h1 className="text-md font-extrabold">DSA List</h1>
           </div>
           <div className="flex space-x-1">
             {navItems.map((item) => {
@@ -59,6 +59,15 @@ export function Navigation() {
               );
             })}
             <ModeToggle />
+            <Link
+              href={"https://github.com/iamshubhamjangle/dsa-list"}
+              className="flex items-center"
+              target="_blank"
+            >
+              <Button key={"github"} variant="outline" size="lg">
+                <Github className="h-4 w-4" />
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

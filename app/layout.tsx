@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Problem List - Study & Manage Coding Problems",
+  title: "DSA List - Study, Track & Manage Coding Problems",
   description:
     "A comprehensive tool for managing and studying coding problems with tags, progress tracking, and study options.",
 };
