@@ -352,6 +352,58 @@ export default function ManagePage() {
               </div>
             </DialogContent>
           </Dialog>
+          <Dialog open={showAddTag} onOpenChange={setShowAddTag}>
+            <DialogTrigger asChild>
+              <Button className="flex items-center space-x-2">
+                <Plus className="h-4 w-4" />
+                <span>Add Tag</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New Tag</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <Input
+                  placeholder="Tag name"
+                  value={newTagName}
+                  onChange={(e) => setNewTagName(e.target.value)}
+                />
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Color
+                  </label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {colorOptions.map((color) => (
+                      <button
+                        key={color}
+                        onClick={() => setNewTagColor(color)}
+                        className={cn(
+                          "w-8 h-8 rounded-full border-2",
+                          color,
+                          newTagColor === color
+                            ? "border-foreground"
+                            : "border-border"
+                        )}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className="flex space-x-3">
+                  <Button onClick={handleAddTag} className="flex-1">
+                    Add
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowAddTag(false)}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
 
           <Button
             asChild
@@ -381,13 +433,13 @@ export default function ManagePage() {
       </div>
 
       {/* Sample Questions Download Link */}
-      <div>
+      <div className="flex justify-end">
         <a
-          href="/sample_questions.csv"
+          href="/sample_questions.xlsx"
           download
-          className="text-muted-foreground text-xs hover:underline text-end inline-block"
+          className="text-muted-foreground text-xs hover:underline"
         >
-          Getting Started? Download Sample Questions .csv
+          Getting Started? Download Sample Questions .xlsx
         </a>
       </div>
 
@@ -396,62 +448,6 @@ export default function ManagePage() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Tags</CardTitle>
-            <Dialog open={showAddTag} onOpenChange={setShowAddTag}>
-              <DialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center space-x-2"
-                >
-                  <Plus className="h-4 w-4" />
-                  <span>Add Tag</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add New Tag</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <Input
-                    placeholder="Tag name"
-                    value={newTagName}
-                    onChange={(e) => setNewTagName(e.target.value)}
-                  />
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Color
-                    </label>
-                    <div className="grid grid-cols-4 gap-2">
-                      {colorOptions.map((color) => (
-                        <button
-                          key={color}
-                          onClick={() => setNewTagColor(color)}
-                          className={cn(
-                            "w-8 h-8 rounded-full border-2",
-                            color,
-                            newTagColor === color
-                              ? "border-foreground"
-                              : "border-border"
-                          )}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex space-x-3">
-                    <Button onClick={handleAddTag} className="flex-1">
-                      Add
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => setShowAddTag(false)}
-                      className="flex-1"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
           </div>
         </CardHeader>
         <CardContent>
