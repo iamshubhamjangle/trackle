@@ -10,6 +10,7 @@ import {
   addTag,
   updateTag,
   deleteTag,
+  saveTags,
 } from "@/lib/storage";
 import { processExcelData, parseCSV } from "@/lib/excel";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import * as XLSX from "xlsx";
 
 export default function ManagePage() {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -161,51 +163,96 @@ export default function ManagePage() {
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      const text = e.target?.result as string;
-      const data = parseCSV(text);
-      let processedQuestions = processExcelData(data);
-      // Ensure all uploaded questions use tag ids only
-      processedQuestions = processedQuestions.map((q) => {
-        let tagIds: string[] = Array.isArray(q.tags)
-          ? q.tags
-              .map((tag) => {
-                // Try to find tag by name (case-insensitive)
-                const found = tags.find(
-                  (t) => t.name.toLowerCase() === String(tag).toLowerCase()
-                );
-                return found ? found.id : undefined;
-              })
-              .filter((id): id is string => Boolean(id))
-          : [];
-        if (tagIds.length === 0) tagIds = ["default"];
-        return {
-          ...q,
-          tags: tagIds,
-        };
-      });
+      const data = new Uint8Array(e.target?.result as ArrayBuffer);
+      const workbook = XLSX.read(data, { type: "array" });
+      // Parse tags first
+      const tagsSheet = workbook.Sheets["Tags"];
+      let importedTags: Tag[] = [];
+      if (tagsSheet) {
+        const tagsJson = XLSX.utils.sheet_to_json(tagsSheet, { header: 1 });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        importedTags = (tagsJson as any[][])
+          .slice(1)
+          .filter((row) => row.length >= 3)
+          .map((row) => ({
+            id: String(row[0]),
+            name: String(row[1]),
+            color: String(row[2]),
+          }));
+      }
 
-      const updatedQuestions = [...questions, ...processedQuestions];
+      // Parse questions
+      const questionsSheet = workbook.Sheets["Questions"];
+      let importedQuestions: Question[] = [];
+      if (questionsSheet) {
+        const questionsJson = XLSX.utils.sheet_to_json(questionsSheet, {
+          header: 1,
+        });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        importedQuestions = (questionsJson as any[][])
+          .slice(1)
+          .filter((row) => row.length >= 6)
+          .map((row) => ({
+            id: `question-${Date.now()}-${Math.random()
+              .toString(36)
+              .slice(2, 8)}`,
+            name: String(row[0]),
+            url: String(row[1]),
+            difficulty: row[2] as "Easy" | "Medium" | "Hard",
+            completed: row[3] === true || row[3] === "true",
+            starred: row[4] === true || row[4] === "true",
+            tags: String(row[5])
+              .split(",")
+              .map((tagId) => tagId.trim())
+              .filter(Boolean),
+          }));
+      }
+
+      // Merge tags and questions
+      const updatedTags = [
+        ...tags,
+        ...importedTags.filter(
+          (t) => !tags.some((existing) => existing.id === t.id)
+        ),
+      ];
+      const updatedQuestions = [...questions, ...importedQuestions];
+      setTags(updatedTags);
       setQuestions(updatedQuestions);
       saveQuestions(updatedQuestions);
+      saveTags(updatedTags);
     };
-    reader.readAsText(file);
+    reader.readAsArrayBuffer(file);
   };
 
   const exportQuestions = () => {
-    const csvContent = [
-      "title,url,difficulty,tags",
-      ...questions.map(
-        (q) => `${q.name},${q.url},${q.difficulty},${q.tags.join(",")}`
-      ),
-    ].join("\n");
+    // Prepare questions sheet data
+    const questionsSheet = [
+      ["name", "url", "difficulty", "completed", "starred", "tags"],
+      ...questions.map((q) => [
+        q.name,
+        q.url,
+        q.difficulty,
+        q.completed ?? false,
+        q.starred ?? false,
+        q.tags.join(","),
+      ]),
+    ];
 
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "questions.csv";
-    a.click();
-    window.URL.revokeObjectURL(url);
+    // Prepare tags sheet data
+    const tagsSheet = [
+      ["id", "name", "color"],
+      ...tags.map((t) => [t.id, t.name, t.color]),
+    ];
+
+    // Create workbook
+    const wb = XLSX.utils.book_new();
+    const wsQuestions = XLSX.utils.aoa_to_sheet(questionsSheet);
+    const wsTags = XLSX.utils.aoa_to_sheet(tagsSheet);
+    XLSX.utils.book_append_sheet(wb, wsQuestions, "Questions");
+    XLSX.utils.book_append_sheet(wb, wsTags, "Tags");
+
+    // Export to file
+    XLSX.writeFile(wb, "questions_and_tags.xlsx");
   };
 
   const getDifficultyBadgeVariant = (difficulty: string) => {
@@ -313,10 +360,10 @@ export default function ManagePage() {
           >
             <label className="cursor-pointer">
               <Upload className="h-4 w-4" />
-              <span>Upload CSV</span>
+              <span>Upload Excel File</span>
               <input
                 type="file"
-                accept=".csv"
+                accept=".xlsx"
                 onChange={handleFileUpload}
                 className="hidden"
               />
