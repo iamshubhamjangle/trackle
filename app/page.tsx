@@ -11,7 +11,6 @@ import {
   Eye,
   EyeOff,
   Shuffle,
-  List,
   GalleryVertical,
   FoldVertical,
   UnfoldVertical,
@@ -196,9 +195,9 @@ export default function StudyPage() {
   };
 
   const getQuestionsForTag = (tagId: string) => {
-    let tagQuestions = questions.filter((q) =>
-      q.tags.includes(tagId.toLowerCase())
-    );
+    // Ensure tagId and q.tags are both strings and compared as such
+    let tagQuestions = questions.filter((q) => q.tags.includes(tagId));
+
     // Filter by starred if needed
     if (studyOptions.starred) {
       tagQuestions = tagQuestions.filter((q) => progress[q.id]?.starred);
@@ -217,7 +216,7 @@ export default function StudyPage() {
       return tags
         .map((tagDetails) => ({
           tag: tagDetails,
-          questions: getQuestionsForTag(tagDetails.name),
+          questions: getQuestionsForTag(tagDetails.id),
         }))
         .filter((group) => group.questions.length > 0);
     } else {

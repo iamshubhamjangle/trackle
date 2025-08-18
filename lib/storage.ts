@@ -15,11 +15,6 @@ export const DEFAULT_TAGS: Tag[] = [
     color: "bg-gray-500",
   },
   {
-    id: "starred",
-    name: "Starred",
-    color: "bg-yellow-500",
-  },
-  {
     id: "tag-1755331013001",
     name: "Arrays",
     color: "bg-blue-500",

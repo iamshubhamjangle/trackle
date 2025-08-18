@@ -106,16 +106,19 @@ export default function ManagePage() {
   // Question management
   const handleAddQuestion = () => {
     if (newQuestion.name && newQuestion.url) {
-      // Convert tag ids to tag names
-      const tagNames = newQuestion.tags.map(
-        (tagId) => tags.find((t) => t.id === tagId)?.name || tagId
-      );
+      // Store tag ids directly, fallback to 'default' if any tag is missing
+      const validTags =
+        newQuestion.tags.length > 0
+          ? newQuestion.tags.map((tagId) =>
+              tags.some((t) => t.id === tagId) ? tagId : "default"
+            )
+          : ["default"];
       const question: Question = {
         id: `question-${Date.now()}`,
         name: newQuestion.name,
         url: newQuestion.url,
         difficulty: newQuestion.difficulty,
-        tags: tagNames,
+        tags: validTags,
         completed: false,
         starred: false,
       };
@@ -129,11 +132,11 @@ export default function ManagePage() {
 
   const handleUpdateQuestion = () => {
     if (editingQuestion) {
-      // Convert tag ids to tag names for the updated question
-      const tagNames = editingQuestion.tags.map(
-        (tagId) => tags.find((t) => t.id === tagId)?.name || tagId
-      );
-      const updatedQuestion = { ...editingQuestion, tags: tagNames };
+      // Store tag ids directly for the updated question
+      const updatedQuestion = {
+        ...editingQuestion,
+        tags: editingQuestion.tags,
+      };
       const updatedQuestions = questions.map((q) =>
         q.id === editingQuestion.id ? updatedQuestion : q
       );
@@ -160,7 +163,26 @@ export default function ManagePage() {
     reader.onload = (e) => {
       const text = e.target?.result as string;
       const data = parseCSV(text);
-      const processedQuestions = processExcelData(data);
+      let processedQuestions = processExcelData(data);
+      // Ensure all uploaded questions use tag ids only
+      processedQuestions = processedQuestions.map((q) => {
+        let tagIds: string[] = Array.isArray(q.tags)
+          ? q.tags
+              .map((tag) => {
+                // Try to find tag by name (case-insensitive)
+                const found = tags.find(
+                  (t) => t.name.toLowerCase() === String(tag).toLowerCase()
+                );
+                return found ? found.id : undefined;
+              })
+              .filter((id): id is string => Boolean(id))
+          : [];
+        if (tagIds.length === 0) tagIds = ["default"];
+        return {
+          ...q,
+          tags: tagIds,
+        };
+      });
 
       const updatedQuestions = [...questions, ...processedQuestions];
       setQuestions(updatedQuestions);
@@ -474,14 +496,14 @@ export default function ManagePage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex flex-wrap gap-1">
                         {question.tags.map((tagId) => {
-                          //   const tag = tags.find((t) => t.id === tagId);
-                          return tagId ? (
+                          const tag = tags.find((t) => t.id === tagId);
+                          return tag ? (
                             <Badge
-                              key={tagId}
+                              key={tag.id}
                               variant="outline"
                               className={cn("text-primary")}
                             >
-                              {tagId}
+                              {tag.name}
                             </Badge>
                           ) : null;
                         })}
