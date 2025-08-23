@@ -156,7 +156,16 @@ export function Tags({
           >
             <GripVertical size={16} />
           </button>
-          <Badge className={cn("text-white", tag.color)}>{tag.name}</Badge>
+          <Badge
+            className={cn(
+              tag.color,
+              tag.color.includes("yellow") || tag.color.includes("green")
+                ? "text-primary"
+                : "text-white"
+            )}
+          >
+            {tag.name}
+          </Badge>
         </div>
         <div className="flex gap-2">
           <Button
