@@ -134,10 +134,13 @@ export default function ManagePage() {
 
   const handleUpdateQuestion = () => {
     if (editingQuestion) {
-      // Store tag ids directly for the updated question
+      // Ensure we store valid tag IDs only
+      const validTags = editingQuestion.tags.filter((tagId) =>
+        tags.some((t) => t.id === tagId)
+      );
       const updatedQuestion = {
         ...editingQuestion,
-        tags: editingQuestion.tags,
+        tags: validTags,
       };
       const updatedQuestions = questions.map((q) =>
         q.id === editingQuestion.id ? updatedQuestion : q
@@ -631,24 +634,11 @@ export default function ManagePage() {
                   {tags.map((tag) => (
                     <label key={tag.id} className="flex items-center space-x-2">
                       <Checkbox
-                        checked={editingQuestion.tags.some(
-                          (t) => t.toLowerCase() === tag.name.toLowerCase()
-                        )}
+                        checked={editingQuestion.tags.includes(tag.id)}
                         onCheckedChange={(checked) => {
-                          const tagNameLower = tag.name.toLowerCase();
-                          let newTags;
-                          if (checked) {
-                            // Add only if not present (case-insensitive)
-                            newTags = editingQuestion.tags.some(
-                              (t) => t.toLowerCase() === tagNameLower
-                            )
-                              ? editingQuestion.tags
-                              : [...editingQuestion.tags, tag.name];
-                          } else {
-                            newTags = editingQuestion.tags.filter(
-                              (t) => t.toLowerCase() !== tagNameLower
-                            );
-                          }
+                          const newTags = checked
+                            ? [...editingQuestion.tags, tag.id]
+                            : editingQuestion.tags.filter((t) => t !== tag.id);
                           setEditingQuestion({
                             ...editingQuestion,
                             tags: newTags,
