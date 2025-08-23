@@ -1,20 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  ChevronDown,
-  ChevronRight,
-  Star,
-  CheckCircle,
-  Circle,
-  RotateCcw,
-  Eye,
-  EyeOff,
-  Shuffle,
-  GalleryVertical,
-  FoldVertical,
-  UnfoldVertical,
-} from "lucide-react";
 import { Question, Tag, StudyOptions } from "@/lib/types";
 import {
   getQuestions,
@@ -24,12 +10,9 @@ import {
   getStudyOptions,
   saveStudyOptions,
 } from "@/lib/storage";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-
-import { cn } from "@/lib/utils";
-import { Progress } from "@/components/ui/progress";
+import { Header } from "@/components/home/header";
+import { Progress } from "@/components/home/progress";
+import { Questions } from "@/components/home/questions";
 
 export default function StudyPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -251,234 +234,29 @@ export default function StudyPage() {
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center">
-        <span className="text-sm text-muted-foreground min-w-xs">
-          Progress: {getCompletedCount()}/{getTotalCount()}
-        </span>
-        <Progress value={(getCompletedCount() / getTotalCount()) * 100} />
-      </div>
+      <Header
+        studyOptions={studyOptions}
+        toggleDifficulty={toggleDifficulty}
+        toggleRandomize={toggleRandomize}
+        toggleCategoryWise={toggleCategoryWise}
+        toggleAllFolded={toggleAllFolded}
+        toggleStarred={toggleStarred}
+        resetProgress={resetProgress}
+      />
 
-      {/* Study Options */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <Button
-          onClick={toggleDifficulty}
-          // variant={studyOptions.showDifficulty ? "default" : "outline"}
-          variant="outline"
-          size="sm"
-          className="flex items-center space-x-2"
-        >
-          {studyOptions.showDifficulty ? (
-            <>
-              <EyeOff className="h-4 w-4" />
-              <span>Hide Difficulty</span>
-            </>
-          ) : (
-            <>
-              <Eye className="h-4 w-4" />
-              <span>Show Difficulty</span>
-            </>
-          )}
-        </Button>
+      <Progress questions={questions} progress={progress} />
 
-        <Button
-          onClick={toggleRandomize}
-          variant={studyOptions.randomize ? "default" : "outline"}
-          size="sm"
-          className="flex items-center space-x-2"
-        >
-          <Shuffle className="h-4 w-4" />
-          <span>Randomize</span>
-        </Button>
-
-        <Button
-          onClick={toggleCategoryWise}
-          variant={studyOptions.categoryWise ? "default" : "outline"}
-          size="sm"
-          className="flex items-center space-x-2"
-        >
-          <GalleryVertical className="h-4 w-4" />
-          <span>Topic Wise</span>
-        </Button>
-
-        <Button
-          onClick={toggleStarred}
-          variant={studyOptions.starred ? "default" : "outline"}
-          size="sm"
-          className="flex items-center space-x-2"
-        >
-          <Star className="h-4 w-4" />
-          <span>Starred</span>
-        </Button>
-
-        <Button
-          onClick={toggleAllFolded}
-          disabled={!studyOptions.categoryWise}
-          // variant={studyOptions.allFolded ? "default" : "outline"}
-          variant="outline"
-          size="sm"
-          className="flex items-center space-x-2"
-        >
-          {studyOptions.allFolded ? (
-            <>
-              <UnfoldVertical className="h-4 w-4" />
-              <span>Unfold Questions</span>
-            </>
-          ) : (
-            <>
-              <FoldVertical className="h-4 w-4" />
-              <span>Fold Questions</span>
-            </>
-          )}
-        </Button>
-
-        <Button
-          onClick={resetProgress}
-          variant="outline"
-          size="sm"
-          className="flex items-center space-x-2"
-        >
-          <RotateCcw className="h-4 w-4" />
-          <span>Reset Progress</span>
-        </Button>
-      </div>
-
-      {/* Questions by Tags */}
-      <div>
-        {getFilteredQuestions().map(({ tag, questions: tagQuestions }) => (
-          <Card
-            key={tag.id}
-            className="hover:bg-muted/50 transition-colors py-2"
-          >
-            <CardHeader
-              className="cursor-pointer"
-              onClick={() => {
-                // donot fold if in all questions mode
-                if (!studyOptions.categoryWise) return;
-                toggleTagExpansion(tag.id);
-              }}
-            >
-              <div className="flex items-center justify-between w-full">
-                <div className="flex items-center space-x-3">
-                  <div className={cn("w-4 h-4 rounded-full", tag.color)} />
-                  <CardTitle className="text-lg">
-                    {tag.name} (
-                    {
-                      tagQuestions.filter(
-                        (q) => getQuestionProgress(q.id).completed
-                      ).length
-                    }
-                    /{tagQuestions.length})
-                  </CardTitle>
-                </div>
-                <div className="flex flex-1 items-center space-x-2 ml-10">
-                  <Progress
-                    value={
-                      tagQuestions.length === 0
-                        ? 0
-                        : (tagQuestions.filter(
-                            (q) => getQuestionProgress(q.id).completed
-                          ).length /
-                            tagQuestions.length) *
-                          100
-                    }
-                  />
-                  {expandedTags.has(tag.id) ? (
-                    <ChevronDown className="h-5 w-5 text-muted-foreground mt-1" />
-                  ) : (
-                    <ChevronRight className="h-5 w-5 text-muted-foreground mt-1" />
-                  )}
-                </div>
-              </div>
-            </CardHeader>
-
-            {expandedTags.has(tag.id) && (
-              <CardContent className="pt-0">
-                <div className="divide-y">
-                  {tagQuestions.map((question) => {
-                    const questionProgress = getQuestionProgress(question.id);
-                    return (
-                      <div
-                        key={question.id}
-                        className="py-3 first:pt-0 last:pb-0"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-3 flex-1">
-                            <Button
-                              onClick={() =>
-                                toggleQuestionCompleted(question.id)
-                              }
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0 text-muted-foreground hover:text-green-600"
-                            >
-                              {questionProgress.completed ? (
-                                <CheckCircle className="h-5 w-5 text-green-600" />
-                              ) : (
-                                <Circle className="h-5 w-5" />
-                              )}
-                            </Button>
-
-                            <Button
-                              onClick={() => toggleQuestionStarred(question.id)}
-                              variant="ghost"
-                              size="sm"
-                              className={cn(
-                                "h-8 w-8 p-0 transition-colors",
-                                questionProgress.starred
-                                  ? "text-yellow-500"
-                                  : "text-muted-foreground hover:text-yellow-500"
-                              )}
-                            >
-                              <Star
-                                className={cn(
-                                  "h-4 w-4",
-                                  questionProgress.starred && "fill-current"
-                                )}
-                              />
-                            </Button>
-
-                            <div className="flex-1">
-                              <a
-                                href={question.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-sm font-medium hover:text-primary transition-colors"
-                              >
-                                {question.name}
-                              </a>
-                            </div>
-                          </div>
-
-                          {studyOptions.showDifficulty && (
-                            <Badge variant="outline">
-                              {question.difficulty}
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            )}
-          </Card>
-        ))}
-      </div>
-
-      {/* No Questions Message */}
-      {questions.length === 0 && (
-        <Card className="text-center py-12">
-          <CardContent>
-            <p className="text-muted-foreground text-lg">
-              No questions added yet.
-            </p>
-            <p className="text-muted-foreground text-sm mt-2">
-              Go to the Manage page to add questions and tags.
-            </p>
-          </CardContent>
-        </Card>
-      )}
+      <Questions
+        questions={questions}
+        tags={tags}
+        progress={progress}
+        studyOptions={studyOptions}
+        expandedTags={expandedTags}
+        toggleTagExpansion={toggleTagExpansion}
+        toggleQuestionCompleted={toggleQuestionCompleted}
+        toggleQuestionStarred={toggleQuestionStarred}
+        randomOrder={randomOrder}
+      />
     </div>
   );
 }
