@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Plus, Edit, Trash2, Upload, Download } from "lucide-react";
 import { Question, Tag } from "@/lib/types";
+import { Tags } from "@/components/manage/tags";
 import {
   getQuestions,
   saveQuestions,
@@ -446,50 +447,19 @@ export default function ManagePage() {
       </div>
 
       {/* Tags Section */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Tags</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {tags.map((tag) => (
-              <div
-                key={tag.id}
-                className="flex items-center justify-between p-3 border rounded-lg"
-              >
-                <div className="flex items-center space-x-2">
-                  <div className={cn("w-3 h-3 rounded-full", tag.color)} />
-                  <span className="text-sm font-medium">{tag.name}</span>
-                </div>
-                <div className="flex space-x-1">
-                  <Button
-                    onClick={() => {
-                      setEditingTag(tag);
-                      setNewTagName(tag.name);
-                      setNewTagColor(tag.color);
-                    }}
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
-                  >
-                    <Edit className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    onClick={() => handleDeleteTag(tag.id)}
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <Tags
+        tags={tags}
+        onUpdateTag={(tag) => {
+          updateTag(tag.id, { name: tag.name, color: tag.color });
+          setTags(getTags());
+        }}
+        onDeleteTag={handleDeleteTag}
+        onReorderTags={(newTags) => {
+          saveTags(newTags);
+          setTags(newTags);
+        }}
+        colorOptions={colorOptions}
+      />
 
       {/* Questions Section */}
       <Card>
