@@ -110,7 +110,11 @@ export function Questions({
                 href={question.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm font-medium hover:text-primary transition-colors"
+                className={cn(
+                  "text-sm font-medium hover:text-primary transition-colors",
+                  questionProgress.completed &&
+                    "line-through text-muted-foreground"
+                )}
               >
                 {question.name}
               </a>
